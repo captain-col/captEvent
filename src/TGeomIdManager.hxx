@@ -22,7 +22,7 @@ namespace CP {
     class TGeomIdManager;
     class TManager;
     class TEvent;
-};
+}
 
 /// Translate TGeometryId objects into TGeoNode pointers used with
 /// TGeoManager.  This is a singleton object managed and owned by TManager.

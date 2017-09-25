@@ -21,7 +21,7 @@ namespace CP {
 
     // A handle to reference a TDigit object that may or may not be available.
     class TDigitProxy;
-};
+}
 
 /// An abstract base class for raw digits.  This base class for detector
 /// specific digit classes.  There are derived classes which define the

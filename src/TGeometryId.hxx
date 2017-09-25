@@ -28,7 +28,7 @@ namespace CP {
     bool operator ==(const CP::TGeometryId& a, const CP::TGeometryId& b);
     bool operator !=(const CP::TGeometryId& a, const CP::TGeometryId& b);
     std::ostream& operator<<(std::ostream& s, const CP::TGeometryId& id);
-};
+}
 
 /// Geometry identifier class to uniquely identify a particular volume within
 /// the detector.  This is an opaque type used to index the databases.  It

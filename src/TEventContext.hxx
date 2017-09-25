@@ -9,7 +9,7 @@
 namespace CP {
     class TEventContext;
     std::ostream& operator<<(std::ostream& s, const CP::TEventContext& c);
-};
+}
 
 /// Define the context of an event.  The event context uniquely identifies an
 /// event.  Due to the way events are formed, not all event (or slow control

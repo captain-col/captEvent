@@ -11,7 +11,7 @@ namespace CP {
     class TDigit;
     class TDigitHeader;
     class TDigitContainer;
-};
+}
 
 /// A container for TDigit and TDigitHeader objects.  The TDigitContainer
 /// class holds a representation of the uncalibrated electronics data.  The

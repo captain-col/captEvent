@@ -28,7 +28,7 @@ namespace CP {
 
     class TDigitManager;
     class TDigitContainer;
-};
+}
 
 /// A handle to reference a TDigit object that may or may not be available.
 /// This differs from a THandle in that the proxy doesn't keep the object from

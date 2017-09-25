@@ -311,7 +311,7 @@ namespace CP {
 
         ClassDefT(THandle,10);
     };
-    ClassDefT2(THandle,T);
+    ClassDefT2(THandle,T)
 
     /// Turn a THandle object into a pointer.  This is implemented as a
     /// function so that it is *really* clear that something funky is going

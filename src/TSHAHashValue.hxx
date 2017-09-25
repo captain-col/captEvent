@@ -16,7 +16,7 @@ namespace CP {
                     const CP::TSHAHashValue& rhs);
     bool operator!=(const CP::TSHAHashValue& lhs, 
                     const CP::TSHAHashValue& rhs);
-};
+}
 
 /// Save a SHA hash code value.  The hashcode value can be ordered using the
 /// "<" operator and compared for equality using the "==" operator.  The hash
