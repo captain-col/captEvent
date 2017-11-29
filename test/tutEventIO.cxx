@@ -61,15 +61,18 @@ namespace {
         event.push_back(new CP::TDataVector("truth"));
         CP::THandle<CP::TDataVector> truth 
             = event.Get<CP::TDataVector>("truth");
-        CreateTG4Hits(*truth,"p0d");
-        CreateTG4Hits(*truth,"fgd");
+        CreateTG4Hits(*truth,"captain");
+        CreateTG4Hits(*truth,"other");
     }
 
     void CreateHits(CP::TEvent& event, std::string name) {
         std::string g4Name = "truth/g4Hits/" + name;
         CP::THandle<CP::TG4HitContainer> g4Hits 
             = event.Get<CP::TG4HitContainer>(g4Name);
-        if (!g4Hits) return;
+        if (!g4Hits) {
+            CaptError("Missing G4 hits");
+            return;
+        }
 
         std::string containerTitle("Hits for the "
                                    + name 
@@ -79,12 +82,18 @@ namespace {
                                                         containerTitle.c_str());
         event.Get<CP::TDataVector>("hits")->push_back(hits);
 
+        CaptError("Hits for " << name << " " << g4Hits->size());
+        
         for (CP::TG4HitContainer::iterator g4Hit = g4Hits->begin();
              g4Hit != g4Hits->end();
              ++g4Hit) {
             CP::TWritableMCHit mcHit;
             CP::TG4HitSegment* hitSeg
                 = dynamic_cast<CP::TG4HitSegment*>(*g4Hit);
+            if (!hitSeg) {
+                CaptError("Illegal hit segment");
+                throw;
+            }
             mcHit.SetGeomId(CP::GeomId::Captain::Wire(0,50));
             mcHit.SetCharge(hitSeg->GetPrimaryTrajectoryId());
             mcHit.SetTime(hitSeg->GetPrimaryTrajectoryId());
@@ -99,7 +108,7 @@ namespace {
         CP::TAlgorithmResult *result
             = new CP::TAlgorithmResult("firstResult",
                                        "Test Result");
-        CP::THandle<CP::THitSelection> hits = event.GetHits("p0d");
+        CP::THandle<CP::THitSelection> hits = event.GetHits("captain");
         CP::THitSelection *newHits = new CP::THitSelection("newHits");
         std::copy(hits->begin(), hits->end(), std::back_inserter(*newHits));
         result->AddHits(newHits);
@@ -108,7 +117,7 @@ namespace {
         // Create a second algorithm result.
         result = new CP::TAlgorithmResult("secondResult",
                                           "Test Result");
-        hits = event.GetHits("p0d");
+        hits = event.GetHits("captain");
         CP::THitSelection* moreHits = new CP::THitSelection("moreHits");
         std::copy(hits->begin(),hits->end(),std::back_inserter(*moreHits));
         result->AddHits(moreHits);
@@ -143,12 +152,12 @@ namespace {
     void FillEvent(CP::TEvent& event) {
         CreateTruth(event);
         CreateHits(event,"captain");
+        event.ls("dump");
         CreateResults(event);
         CreateTemporary(event);
     }
 }
 
-#ifdef TEST_EVENT_IO
 namespace tut {
     struct baseEventIO {
         static std::vector<CP::TEvent*> outputEvents;
@@ -161,13 +170,13 @@ namespace tut {
                 if (outputEvents.size()<1) {
                     CP::TRootOutput* output 
                         = new CP::TRootOutput(fileName,"RECREATE");
-                    for (int i=0; i<5; ++i) {
+                    for (int i=0; i<1; ++i) {
                         CP::TEvent* event = new CP::TEvent();
+                        FillEvent(*event);
                         event->SetRunId(1);
                         event->SetEventId(i);
                         CaptTrace("Write event");
                         outputEvents.push_back(event);
-                        FillEvent(*event);
                         output->WriteEvent(*event);
                     }
                     output->Close();
@@ -309,8 +318,8 @@ namespace tut {
                 ensure("Output is a TG4HitSegment", outSeg);
                 ensure("Input is a TG4HitSegment", inSeg);
                 ensure_equals("CAPTAIN data fields match",
-                              inSeg->GetPrimaryId(),
-                              outSeg->GetPrimaryId());
+                              inSeg->GetPrimaryTrajectoryId(),
+                              outSeg->GetPrimaryTrajectoryId());
             }
         }
     }
@@ -365,15 +374,15 @@ namespace tut {
                 ensure_equals("CAPTAIN MC hit times match",
                               inMCHit->GetTime(), outMCHit->GetTime());
 
-                const CP::TMCHit::ContributorContainer& inContrib 
-                    = inMCHit->GetContributors();
-                const CP::TMCHit::ContributorContainer& outContrib 
-                    = outMCHit->GetContributors();
+                const CP::TMCHit::TruthContainer& inContrib 
+                    = inMCHit->GetTruth();
+                const CP::TMCHit::TruthContainer& outContrib 
+                    = outMCHit->GetTruth();
                 
-                ensure_greaterthan("CAPTAIN contributors exist",
+                ensure_greaterthan("CAPTAIN hit segments exist",
                                    inContrib.size(),
                                    (unsigned) 0);
-                ensure_equals("CAPTAIN number of contributors match",
+                ensure_equals("CAPTAIN number of hit segments match",
                               inContrib.size(), outContrib.size());
                 
                 CP::TG4VHit* inG4VHit = inContrib[0];
@@ -394,17 +403,17 @@ namespace tut {
                        outG4HitSegment);
                 
                 ensure_equals("CAPTAIN primary particle identifiers match",
-                              inG4HitSegment->GetPrimaryId(),
-                              outG4HitSegment->GetPrimaryId());
+                              inG4HitSegment->GetPrimaryTrajectoryId(),
+                              outG4HitSegment->GetPrimaryTrajectoryId());
 
                 ensure_greaterthan("CAPTAIN primary particle identifiers not zero",
-                                   inG4HitSegment->GetPrimaryId(),0);
+                                   inG4HitSegment->GetPrimaryTrajectoryId(),0);
                     
                 ensure_distance("CAPTAIN energy deposits match",
                                 inG4HitSegment->GetEnergyDeposit(),
                                 outG4HitSegment->GetEnergyDeposit(), 0.001);
 
-                double inPrim = 10.0 + 1.0*inG4HitSegment->GetPrimaryId();
+                double inPrim = 10.0 + 1.0*inG4HitSegment->GetPrimaryTrajectoryId();
                 ensure_distance("CAPTAIN energy deposits match id",
                                 inG4HitSegment->GetEnergyDeposit(),
                                 inPrim, 0.0001);
@@ -585,4 +594,3 @@ namespace tut {
         }
     }
 };
-#endif
