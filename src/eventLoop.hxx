@@ -5,15 +5,23 @@
 
 namespace CP {
 /// The CP::eventLoop() function provides a basic event loop that will call
-/// user code for each event.  See CP::TEventLoopFunction for a base class
-/// that can be used with this event loop.  This is used in code like this:
+/// user code for each event.  It will print a summary of the event file after
+/// the last event is read.  The summary is a single line with the prefix
+/// "Event_File_Summary:" that is followed by comma separated values.  The
+/// values are: 1) the run number of the first event; 2) the subrun number of
+/// the first event, 3) the event id of the first event; 4) the date string
+/// (in UTC) of the first event; 5) the number of events read from the input
+/// file; and 6) the number of events written to the output file.
+/// 
+/// See CP::TEventLoopFunction for a base class that can be used with this
+/// event loop.  The simplest possible event loop code is done like this:
 ///
 /// \code
 /// class TDumpEvent: public CP::TEventLoopFunction {
 /// public:
 ///     bool operator () (CP::TEvent& event) {
-///         // User Code
-///         return true;
+///         // User Code (just returns).
+///         return true; // "true" to save event to output
 ///     }
 /// };
 ///

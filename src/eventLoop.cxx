@@ -3,6 +3,7 @@
 #include "ECore.hxx"
 
 #include "TEvent.hxx"
+#include "TEventContext.hxx"
 #include "TRootInput.hxx"
 #include "TRootOutput.hxx"
 #include "TManager.hxx"
@@ -471,8 +472,10 @@ int CP::eventLoop(int argc, char** argv,
         
         // Open input the file
         std::string fileName = argv[optind++];
-        int lastEventId = -1;
-        int lastRunId = -1;
+        CP::TEventContext firstContext;
+        CP::TEventContext lastContext;
+        int fileRead = 0;
+        int fileWritten = 0;
         try {
             std::unique_ptr<CP::TVInputFile> input;
             try {
@@ -525,6 +528,9 @@ int CP::eventLoop(int argc, char** argv,
                 else --skipCount;
             }
 
+            // Get the first event context that will be processed.
+            firstContext = event->GetContext();
+            
             // Process the events in the file.
             for (;!input->EndOfFile();event.reset(input->NextEvent())) {
 
@@ -537,9 +543,10 @@ int CP::eventLoop(int argc, char** argv,
                 else targetEvent = -1;
 
                 ++totalRead;
-
-                lastEventId = event->GetEventId();
-                lastRunId = event->GetRunId();
+                ++fileRead;
+                
+                // Save the last event context that was read.
+                lastContext = event->GetContext();
                 memoryUsage.LogMemory();
                 
                 int saveEvent = -1;
@@ -572,6 +579,7 @@ int CP::eventLoop(int argc, char** argv,
                 if (0 <= saveEvent && saveEvent < (int) outputFiles.size()) {
                     outputFiles[saveEvent]->WriteEvent(*event);
                     ++totalWritten;
+                    ++fileWritten;
                 }
                 
                 event.reset(NULL);
@@ -580,8 +588,7 @@ int CP::eventLoop(int argc, char** argv,
                     CaptError("WARNING: Memory Leak in "
                               << " File(event,run): " << fileName 
                               << ":(" 
-                              << lastEventId 
-                              << "," << lastRunId << ")");
+                              << lastContext << ")");
                 }
                 
                 if (totalRead>(nextOutput-0.5)) {
@@ -630,6 +637,14 @@ int CP::eventLoop(int argc, char** argv,
             exitStatus = 4;
             break;
         }
+        std::cout << "Event_File_Summary: "
+                  << firstContext.GetRun()
+                  << "," << firstContext.GetSubRun()
+                  << "," << firstContext.GetEvent()
+                  << "," << firstContext.GetTimeStampString()
+                  << "," << fileRead
+                  << "," << fileWritten
+                  << std::endl;
     }
     
     if (!outputFiles.empty()) {
