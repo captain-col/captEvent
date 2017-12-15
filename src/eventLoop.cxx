@@ -638,7 +638,8 @@ int CP::eventLoop(int argc, char** argv,
             break;
         }
         std::cout << "Event_File_Summary: "
-                  << firstContext.GetRun()
+                  << "\"" << fileName << "\""
+                  << "," << firstContext.GetRun()
                   << "," << firstContext.GetSubRun()
                   << "," << firstContext.GetEvent()
                   << "," << firstContext.GetTimeStampString()
