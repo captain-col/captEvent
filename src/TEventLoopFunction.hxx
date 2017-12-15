@@ -134,9 +134,12 @@ public:
     virtual void BeginFile(TVInputFile *const);
 
     /// Called after the last event of a file is read, but you should prefer
-    /// Finalize() for general finalization.  This method will be called once
-    /// for each input file.  This takes a pointer to the input file
-    /// which must then be dynamic cast to the correct type.
+    /// Finalize() for general finalization.  This method will only be called
+    /// right before the file is closed, and is only called if the file is
+    /// closed normally.  If reading of the input file ends with an exception,
+    /// this method won't be called.  It will be called at most once for each
+    /// input file.  This takes a pointer to the input file which must then be
+    /// dynamic cast to the correct type.
     ///
     /// \note C++ trivia: When determining which method to call,
     /// "TVInputFile*const" and "TVInputFile*" are equivalent so a method may
