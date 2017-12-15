@@ -623,7 +623,6 @@ int CP::eventLoop(int argc, char** argv,
                           << fileName);
             }
             exitStatus = 3;
-            break;
         }
         catch (...) {
             // Don't crash on an error, but try to go to the next file.
@@ -635,7 +634,6 @@ int CP::eventLoop(int argc, char** argv,
                           << fileName);
             }
             exitStatus = 4;
-            break;
         }
         std::cout << "Event_File_Summary: "
                   << "\"" << fileName << "\""
@@ -646,6 +644,7 @@ int CP::eventLoop(int argc, char** argv,
                   << "," << fileRead
                   << "," << fileWritten
                   << std::endl;
+        if (exitStatus != 0) break;
     }
     
     if (!outputFiles.empty()) {
