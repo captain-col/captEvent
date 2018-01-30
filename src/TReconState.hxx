@@ -153,6 +153,9 @@ private:
 protected:
     std::vector<std::string> fLocalNames; //! do not save
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMReconState,0);
+#endif
 };
 
 /// A mixable base class that adds the energy deposit property to a state.
@@ -195,6 +198,9 @@ protected:
     /// The index of the EDeposit field in the TCorrValues object.
     int fEDepositIndex; //! Do not save.
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMEDepositState,0);
+#endif
 };
 
 /// A mixable base class that adds the position property to a state.  The
@@ -250,6 +256,9 @@ protected:
     /// The index of the Position field in the TCorrValues object.
     int fPositionIndex; //! Do not save.
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMPositionState,0);
+#endif
 };
 
 /// A mixable base class that adds the direction property to a state.  The
@@ -298,6 +307,9 @@ protected:
     /// The index of the Direction field in the TCorrValues object.
     int fDirectionIndex; //! Do not save.
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMDirectionState,0);
+#endif
 };
 
 /// A mixable base class that adds the position and direction properties to a
@@ -320,6 +332,9 @@ public:
     /// The projection operator to get the full state.
     static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMPositionDirectionState,0);
+#endif
 };
 
 /// A mixable base class that adds the width of a TReconShower object.  The
@@ -356,6 +371,9 @@ protected:
     /// The index of the Cone field in the TCorrValues object.
     int fConeIndex; //! Do not save.
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMConeState,0);
+#endif
 };
 
 /// A mixable base class that adds the mass to a state.  The mass state also
@@ -392,6 +410,9 @@ protected:
     /// The index of the Mass field in the TCorrValues object.
     int fMassIndex; //! Do not save.
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMMassState,0);
+#endif
 };
 
 /// A mixable base class that adds the position, direction and mass
@@ -415,6 +436,9 @@ public:
     /// The projection operator to get the full state.
     static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMPosDirMassState,0);
+#endif
 };
 
 /// A mixable base class that adds the width of a curvilinear energy deposit
@@ -452,6 +476,9 @@ protected:
     /// The index of the Width field in the TCorrValues object.
     int fWidthIndex; //! Do not save.
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMWidthState,0);
+#endif
 };
 
 /// A mixable base class that adds a property for the magnitude of the
@@ -488,6 +515,9 @@ protected:
     /// The index of the Momentum field in the TCorrValues object.
     int fMomentumIndex; //! Do not save.
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMMomentumState,0);
+#endif
 };
 
 /// A mixable base class that adds a property for the magnitude of the
@@ -524,5 +554,8 @@ protected:
     /// The index of the Charge field in the TCorrValues object.
     int fChargeIndex; //! Do not save.
 
+#ifdef USE_RECONSTATE_CLASS_DEF
+    ClassDef(CP::TMChargeState,0);
+#endif
 };
 #endif
