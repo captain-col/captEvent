@@ -105,18 +105,6 @@ public:
     virtual void Print(Option_t *opt = "") const {ls(opt);}
 
 protected:
-    friend class TMReconState;
-    friend class TMEDepositState;
-    friend class TMPositionState;
-    friend class TMDirectionState;
-    friend class TMPositionDirectionState;
-    friend class TMConeState;
-    friend class TMMassState;
-    friend class TMPosDirMassState;
-    friend class TMWidthState;
-    friend class TMMomentumState;
-    friend class TMChargeState;
-
     friend class TClusterState;
     friend class TShowerState;
     friend class TTrackState;
