@@ -6,25 +6,32 @@
 ///////////////////////////////////////////////////////
 ClassImp(CP::TPIDState);
 
-CP::TPIDState::TPIDState(): TMReconState(this) {
-    std::copy(fLocalNames.begin(), fLocalNames.end(), 
-              std::back_inserter(fFieldNames));
+CP::TPIDState::TPIDState() {
+
+    ENERGY_DEPOSIT_STATE_DEFINITION;
+    POSITION_STATE_DEFINITION;
+    DIRECTION_STATE_DEFINITION;
+    MOMENTUM_STATE_DEFINITION;
+    CHARGE_STATE_DEFINITION;
+
     Init();
 }
 
-CP::TPIDState::TPIDState(const CP::TTrackState& tstate): TMReconState(this) {
+CP::TPIDState::TPIDState(const CP::TTrackState& tstate) {
 
-    std::copy(fLocalNames.begin(), fLocalNames.end(), 
-              std::back_inserter(fFieldNames));
-
+    ENERGY_DEPOSIT_STATE_DEFINITION;
+    POSITION_STATE_DEFINITION;
+    DIRECTION_STATE_DEFINITION;
+    MOMENTUM_STATE_DEFINITION;
+    CHARGE_STATE_DEFINITION;
 
     Init();
 
     // retrieve the position and it's covariance. 
-    for(int i = 0;i < TMPositionState::GetSize(); ++i) {
+    for(int i = 0;i < 4; ++i) {
         SetValue(i+GetPositionIndex(),
                  tstate.GetValue(i+tstate.GetPositionIndex()));
-        for(int j = 0;j < TMPositionState::GetSize(); ++j) {
+        for(int j = 0;j < 4; ++j) {
             SetCovarianceValue(i+GetPositionIndex(),
                                j+GetPositionIndex(),
                                tstate.GetCovarianceValue(
@@ -34,10 +41,10 @@ CP::TPIDState::TPIDState(const CP::TTrackState& tstate): TMReconState(this) {
     }  
     
     // retrieve the direction and it's covariance.
-    for(int i = 0;i < TMDirectionState::GetSize();++i){
+    for(int i = 0;i < 3;++i){
         SetValue(i+GetDirectionIndex(),
                  tstate.GetValue(i+tstate.GetDirectionIndex()));
-        for(int j = 0;j < TMDirectionState::GetSize();++j){
+        for(int j = 0;j < 3;++j){
             SetCovarianceValue(i+GetDirectionIndex(),
                                j+GetDirectionIndex(),
                                tstate.GetCovarianceValue(
@@ -79,18 +86,15 @@ CP::TPIDState::TPIDState(const CP::TTrackState& tstate): TMReconState(this) {
 }
 
 
-CP::TPIDState::TPIDState(const CP::TShowerState& tstate): TMReconState(this) {
-
-    std::copy(fLocalNames.begin(), fLocalNames.end(), 
-              std::back_inserter(fFieldNames));
+CP::TPIDState::TPIDState(const CP::TShowerState& tstate) {
 
     Init();
 
     // retrieve the position and it's covariance. 
-    for(int i = 0;i < TMPositionState::GetSize(); ++i) {
+    for(int i = 0;i < 4; ++i) {
         SetValue(i+GetPositionIndex(),
                  tstate.GetValue(i+tstate.GetPositionIndex()));
-        for(int j = 0;j < TMPositionState::GetSize(); ++j) {
+        for(int j = 0;j < 4; ++j) {
             SetCovarianceValue(i+GetPositionIndex(),
                                j+GetPositionIndex(),
                                tstate.GetCovarianceValue(
@@ -100,10 +104,10 @@ CP::TPIDState::TPIDState(const CP::TShowerState& tstate): TMReconState(this) {
     }  
     
     // retrieve the direction and it's covariance.
-    for(int i = 0;i < TMDirectionState::GetSize();++i){
+    for(int i = 0;i < 3;++i){
         SetValue(i+GetDirectionIndex(),
                  tstate.GetValue(i+tstate.GetDirectionIndex()));
-        for(int j = 0;j < TMDirectionState::GetSize();++j){
+        for(int j = 0;j < 3;++j){
             SetCovarianceValue(i+GetDirectionIndex(),
                                j+GetDirectionIndex(),
                                tstate.GetCovarianceValue(
@@ -133,18 +137,22 @@ CP::TPIDState::TPIDState(const CP::TShowerState& tstate): TMReconState(this) {
     SetFree(GetChargeIndex());
 }
 
-CP::TPIDState::TPIDState(const CP::TPIDState& init)
-  : TMReconState(this) {
-    std::copy(fLocalNames.begin(), fLocalNames.end(), 
-              std::back_inserter(fFieldNames));
+CP::TPIDState::TPIDState(const CP::TPIDState& init) {
+
+    ENERGY_DEPOSIT_STATE_DEFINITION;
+    POSITION_STATE_DEFINITION;
+    DIRECTION_STATE_DEFINITION;
+    MOMENTUM_STATE_DEFINITION;
+    CHARGE_STATE_DEFINITION;
+
     Init();
 
-    for (int i=0; i<GetSize(); ++i) {
+    for (int i=0; i<GetDimensions(); ++i) {
         SetValue(i,init.GetValue(i));
     }
 
-    for (int i=0; i<GetSize(); ++i) {
-        for (int j=0; j<GetSize(); ++j) {
+    for (int i=0; i<GetDimensions(); ++i) {
+        for (int j=0; j<GetDimensions(); ++j) {
             SetCovarianceValue(i,j,init.GetCovarianceValue(i,j));
         }
     }
@@ -154,12 +162,12 @@ CP::TPIDState::TPIDState(const CP::TPIDState& init)
 CP::TPIDState& CP::TPIDState::operator=(const CP::TPIDState& rhs) {
     if (this == &rhs) return *this;
 
-    for (int i=0; i<GetSize(); ++i) {
+    for (int i=0; i<GetDimensions(); ++i) {
         SetValue(i,rhs.GetValue(i));
     }
 
-    for (int i=0; i<GetSize(); ++i) {
-        for (int j=0; j<GetSize(); ++j) {
+    for (int i=0; i<GetDimensions(); ++i) {
+        for (int j=0; j<GetDimensions(); ++j) {
             SetCovarianceValue(i,j,rhs.GetCovarianceValue(i,j));
         }
     }
@@ -169,73 +177,4 @@ CP::TPIDState& CP::TPIDState::operator=(const CP::TPIDState& rhs) {
 
 CP::TPIDState::~TPIDState() {}
 
-CP::TCorrValues CP::TPIDState::ProjectState(
-    const CP::THandle<CP::TReconState>& proj) {
-    TCorrValues values(TPIDState::GetSize());
-    values.SetType("X Y Z T DX DY DZ Momentum Charge");
-    const TMPositionState* posState 
-        = dynamic_cast<const TMPositionState*>(GetPointer(proj));
-    int base = 0;
-    if (posState) {
-        const int offset = posState->GetPositionIndex();
-        for (int i = 0; i < TMPositionState::GetSize(); ++i) {
-            values.SetValue(i+base, 
-                            posState->GetThis().fValues.GetValue(i+offset));
-            for (int j = 0; j < TMPositionState::GetSize(); ++j) {
-                values.SetCovarianceValue(
-                    i+base, j+base,
-                    posState->GetThis().fValues.GetCovarianceValue(i+offset,
-                                                                   j+offset));
-            }
-        }
-    }
-    const TMDirectionState* dirState 
-        = dynamic_cast<const TMDirectionState*>(GetPointer(proj));
-    base += TMPositionState::GetSize();
-    if (dirState) {
-        const int offset = dirState->GetDirectionIndex();
-        for (int i = 0; i < TMDirectionState::GetSize(); ++i) {
-            values.SetValue(i+base, 
-                            dirState->GetThis().fValues.GetValue(i+offset));
-            for (int j = 0; j < TMDirectionState::GetSize(); ++j) {
-                values.SetCovarianceValue(
-                    i+base, j+base,
-                    dirState->GetThis().fValues.GetCovarianceValue(i+offset,
-                                                                   j+offset));
-            }
-        }
-    }
-    const TMMomentumState* momState 
-        = dynamic_cast<const TMMomentumState*>(GetPointer(proj));
-    base += TMDirectionState::GetSize();
-    if (momState) {
-        const int offset = momState->GetMomentumIndex();
-        for (int i = 0; i < TMMomentumState::GetSize(); ++i) {
-            values.SetValue(i+base,
-                            momState->GetThis().fValues.GetValue(i+offset));
-            for (int j = 0; j < TMMomentumState::GetSize(); ++j) {
-                values.SetCovarianceValue(
-                    i+base, j+base,
-                    momState->GetThis().fValues.GetCovarianceValue(i+offset,
-                                                                    j+offset));
-            }
-        }
-    }
-    const TMChargeState* chgState 
-        = dynamic_cast<const TMChargeState*>(GetPointer(proj));
-    base += TMMomentumState::GetSize();
-    if (chgState) {
-        const int offset = chgState->GetChargeIndex();
-        for (int i = 0; i < TMChargeState::GetSize(); ++i) {
-            values.SetValue(i+base,
-                            chgState->GetThis().fValues.GetValue(i+offset));
-            for (int j = 0; j < TMChargeState::GetSize(); ++j) {
-                values.SetCovarianceValue(
-                    i+base, j+base,
-                    chgState->GetThis().fValues.GetCovarianceValue(i+offset,
-                                                                    j+offset));
-            }
-        }
-    }
-    return values;
-}
+

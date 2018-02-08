@@ -10,14 +10,7 @@ namespace CP {
 
 /// A state holding the parameters associated with a TReconCluster.  
 class CP::TClusterState:
-#ifndef __CINT__
-    public TReconState, 
-    virtual public TMReconState,
-    virtual public TMEDepositState,
-    virtual public TMPositionState
-#else
     public TReconState
-#endif
 {
 public:
     TClusterState();
@@ -25,15 +18,12 @@ public:
     TClusterState(const TClusterState& init);
     virtual TClusterState& operator=(const TClusterState& rhs);
 
-    /// Return the number of entries for the Direction in the TCorrValues
-    /// vector.
-    static int GetSize() {
-        return TMEDepositState::GetSize() + TMPositionState::GetSize();
-    }
+    POSITION_STATE_DECLARATION;
+    ENERGY_DEPOSIT_STATE_DECLARATION;
 
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<CP::TReconState>& state);
-
+    POSITION_STATE_PRIVATE;
+    ENERGY_DEPOSIT_STATE_PRIVATE;
+    
     ClassDef(TClusterState,2);
 };
 #endif

@@ -10,15 +10,7 @@ namespace CP {
 
 /// A state holding the parameters associated with a TReconShower. 
 class CP::TShowerState:
-#ifndef __CINT__
-    public TReconState, 
-    virtual public TMReconState,
-    virtual public TMEDepositState,
-    virtual public TMPositionDirectionState,
-    virtual public TMConeState
-#else
     public TReconState
-#endif
 {
 public:
     TShowerState();
@@ -26,18 +18,16 @@ public:
     virtual ~TShowerState();
     virtual TShowerState& operator=(const TShowerState& rhs);
 
-    /// Return the number of entries for the Direction in the TCorrValues
-    /// vector.
-    static int GetSize() {
-        return TMEDepositState::GetSize() 
-            + TMPositionDirectionState::GetSize()
-            + TMConeState::GetSize();
-    }
-
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(
-        const CP::THandle<CP::TReconState>& state);
-
+    ENERGY_DEPOSIT_STATE_DECLARATION;
+    POSITION_STATE_DECLARATION;
+    DIRECTION_STATE_DECLARATION;
+    CONE_STATE_DECLARATION;
+    
+    ENERGY_DEPOSIT_STATE_PRIVATE;
+    POSITION_STATE_PRIVATE;
+    DIRECTION_STATE_PRIVATE;
+    CONE_STATE_PRIVATE;
+    
     ClassDef(TShowerState,2);
 };
 #endif

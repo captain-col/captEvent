@@ -180,7 +180,7 @@ namespace tut {
         }
     }
 
-    // Test the TVertexState projection operator.
+    // Test the TPIDState projection operator.
     template<> template<>
     void testTReconState::test<7> () {
         CP::THandle<CP::TVertexState> s(new CP::TVertexState);
@@ -190,12 +190,12 @@ namespace tut {
             s->SetCovarianceValue(i,i,double(i+1));
         }
         for (int i = 0; i<s->GetDimensions(); ++i) {
-            ensure_distance("Expected vertex state covariance", 
+            ensure_distance("Expected PID state covariance", 
                             s->GetCovarianceValue(i,i),
                             double(i+1), 0.0001);
         }
- 
-        CP::TCorrValues v = CP::TTrackState::ProjectState(s);
+
+        CP::TCorrValues v = CP::TVertexState::ProjectState(s);
 
         for (int i = 0; i<s->GetDimensions(); ++i) {
             ensure_distance("Vertex state covariance after projection", 
@@ -203,17 +203,11 @@ namespace tut {
                             double(i+1), 0.0001);
         }
 
-        ensure("Vertex as Track -- EDeposit",v.IsFree(0));
-        ensure("Vertex as Track -- X",!v.IsFree(1));
-        ensure("Vertex as Track -- Y",!v.IsFree(2));
-        ensure("Vertex as Track -- Z",!v.IsFree(3));
-        ensure("Vertex as Track -- T",!v.IsFree(4));
-        ensure("Vertex as Track -- DX",v.IsFree(5));
-        ensure("Vertex as Track -- DY",v.IsFree(6));
-        ensure("Vertex as Track -- DZ",v.IsFree(7));
-        ensure("Vertex as Track -- Curvature",v.IsFree(8));
-        ensure("Vertex as Track -- Width 1",v.IsFree(9));
-
+        for (int i = 0; i<s->GetDimensions(); ++i) {
+            ensure_distance("Projected vertex state covariance", 
+                            v.GetCovarianceValue(i,i),
+                            double(i+1), 0.0001);
+        }
     }
-
+    
 };

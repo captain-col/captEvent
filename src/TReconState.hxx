@@ -18,18 +18,6 @@
 
 namespace CP {
     class TReconState;
-    class TMReconState;
-    class TMEDepositState;
-    class TMPositionState;
-    class TMDirectionState;
-    class TMPositionDirectionState;
-    class TMConeState;
-    class TMMassState;
-    class TMPosDirMassState;
-    class TMWidthState;
-    class TMMomentumState;
-    class TMChargeState;
-
     class TClusterState;
     class TShowerState;
     class TTrackState;
@@ -125,28 +113,7 @@ protected:
     ClassDef(TReconState,1);
 };
 
-/// A mixable base class
-class CP::TMReconState {
-public:
-    TMReconState();
-    TMReconState(TReconState* state);
-
-    virtual ~TMReconState();
-
-    TReconState& GetThis() const;
-
-private:
-    TReconState* fThis; //! do not save
-
-protected:
-    std::vector<std::string> fLocalNames; //! do not save
-
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMReconState,0);
-#endif
-};
-
-/// A mixable base class that adds the energy deposit property to a state.
+/// A macro that adds the energy deposit property to a state.
 /// The position state is defined as a scaler and the
 /// associated uncertainty.  
 ///
@@ -154,396 +121,279 @@ protected:
 /// particle ID, the deposit can be in uncalibrated or calibrated energy.  In
 /// the TPC the deposit might be in terms of fempto-coulombs, but for a PMT
 /// the deposit might be based on photo-electrons.
-class CP::TMEDepositState: virtual public TMReconState {
-public:
-    TMEDepositState();
+#define ENERGY_DEPOSIT_STATE_DECLARATION                                \
+    public:                                                             \
+    /**  Get the index of the EDeposit field in the TCorrValues vector.*/ \
+    int GetEDepositIndex() const {return fEDepositIndex;}               \
+    /** Get the value of the EDeposit. */                               \
+    double GetEDeposit() const {return GetValue(fEDepositIndex);}       \
+    /** Set the value of the EDeposit. */                               \
+    void SetEDeposit(double enr) {SetValue(fEDepositIndex,enr);}        \
+    /** Get the variance of the EDeposit.*/                             \
+    double GetEDepositVariance(void) const                              \
+    {return GetCovarianceValue(fEDepositIndex,fEDepositIndex);}         \
+    /** Set the variance of the EDeposit.  */                           \
+    void SetEDepositVariance(double var)                                \
+    {SetCovarianceValue(fEDepositIndex,fEDepositIndex,var);}
 
-    virtual ~TMEDepositState();
+#define ENERGY_DEPOSIT_STATE_PRIVATE                                    \
+    /** The index of the EDeposit field in the TCorrValues vector.*/    \
+    private: unsigned char fEDepositIndex;
 
-    /// Get the value of the EDeposit.
-    double GetEDeposit() const;
+/// This should be included in the class constructor.
+#define ENERGY_DEPOSIT_STATE_DEFINITION                                 \
+    fEDepositIndex=fFieldNames.size();                                  \
+    fFieldNames.push_back("EDeposit")
 
-    /// Set the value of the EDeposit.
-    void SetEDeposit(double enr);
-
-    /// Get the variance of the EDeposit.
-    double GetEDepositVariance(void) const;
-
-    /// Set the variance of the EDeposit.
-    void SetEDepositVariance(double var);
-
-    /// Get the index of the EDeposit field in the TCorrValues vector.
-    int GetEDepositIndex() const {return fEDepositIndex;}
-
-    /// Return the number of entries for the EDeposit in the TCorrValues
-    /// vector.
-    static int GetSize() {return 1;}
-
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
-
-protected:
-    /// The index of the EDeposit field in the TCorrValues object.
-    int fEDepositIndex; //! Do not save.
-
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMEDepositState,0);
-#endif
-};
-
-/// A mixable base class that adds the position property to a state.  The
-/// position state is defined as a four vector (X,Y,Z,T) and the associated
-/// uncertainties. 
-class CP::TMPositionState: virtual public TMReconState {
-public:
-    TMPositionState();
-
-    virtual ~TMPositionState();
-
-    /// Get the value of the Position.
-    TLorentzVector GetPosition() const;
-
-    /// Set the value of the Position.
-    void SetPosition(double x, double y, double z, double t);
-
-    /// Set the value of the Position.
-    void SetPosition(const TLorentzVector& pos);
-
-    /// Get the variance of the Position.
-    TLorentzVector GetPositionVariance(void) const;
-
-    /// Set the variance of the Position.
-    void SetPositionVariance(double x, double y, double z, double t);
-
-    /// Set the covariance of the position variables.  The indices run from 0
-    /// to 3 (0: X, 1: Y, 2: Z, 3: T).
-    void SetPositionCovariance(int i, int j, double v);
-
-    /// Get the covariance of the position variables.  The indices run from 0
-    /// to 3 (0: X, 1: Y, 2: Z, 3: T).
-    double GetPositionCovariance(int i, int j);
-
-    /// Get the index of the Position field in the TCorrValues vector.
-    int GetPositionIndex() const {return fPositionIndex;}
-
-    /// Get the index of the X,Y,Z,T fields in the TCorrValues vector.
-    int GetXIndex() const {return fPositionIndex;}
-    int GetYIndex() const {return fPositionIndex+1;}
-    int GetZIndex() const {return fPositionIndex+2;}
-    int GetTIndex() const {return fPositionIndex+3;}
-
-    /// Return the number of entries for the Position in the TCorrValues
-    /// vector.
-    static int GetSize() {return 4;}
-
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
-
-protected:
-
-    /// The index of the Position field in the TCorrValues object.
-    int fPositionIndex; //! Do not save.
-
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMPositionState,0);
-#endif
-};
-
-/// A mixable base class that adds the direction property to a state.  The
-/// direction state is defined as a three vector (dX,dY,dZ) and the associated
-/// uncertainties.  The corelations between the components are enforced in the
-/// covariance matrix.
-class CP::TMDirectionState: virtual public TMReconState {
-public:
-    TMDirectionState();
-    virtual ~TMDirectionState();
-
-    /// Get the value of the Direction.
-    TVector3 GetDirection() const;
-
-    /// Set the value of the Direction.
-    void SetDirection(double x, double y, double z);
-
-    /// Set the value of the Direction.
-    void SetDirection(const TVector3&);
-
-    /// Get the variance of the Direction.
-    TVector3 GetDirectionVariance(void) const;
-
-    /// Set the variance of the Direction.
-    void SetDirectionVariance(double x, double y, double z);
-
-    /// Set the covariance of the direction variables.  The indices run from 0
-    /// to 2 (0: X, 1: Y, 2: Z).
-    void SetDirectionCovariance(int i, int j, double v);
-
-    /// Get the covariance of the direction variables.  The indices run from 0
-    /// to 2 (0: X, 1: Y, 2: Z).
-    double GetDirectionCovariance(int i, int j);
-
-    /// Get the index of the Direction field in the TCorrValues vector.
-    int GetDirectionIndex() const {return fDirectionIndex;}
-
-    /// Return the number of entries for the Direction in the TCorrValues
-    /// vector.
-    static int GetSize() {return 3;}
-
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
-
-protected:
-    /// The index of the Direction field in the TCorrValues object.
-    int fDirectionIndex; //! Do not save.
-
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMDirectionState,0);
-#endif
-};
-
-/// A mixable base class that adds the position and direction properties to a
-/// state using the TPositionState and TDirectionState classes.
-class CP::TMPositionDirectionState: virtual public TMPositionState, 
-                                    virtual public TMDirectionState {
-public:
-    TMPositionDirectionState() {};
-    virtual ~TMPositionDirectionState();
-
-    /// Get the index of the Direction field in the TCorrValues vector.
-    int GetPositionDirectionIndex() const {return GetPositionIndex();}
-
-    /// Return the number of entries for the Direction in the TCorrValues
-    /// vector.
-    static int GetSize() {
-        return TMPositionState::GetSize() + TMDirectionState::GetSize();
+/// A macro that adds the position property to a state.  The position state is
+/// defined as a four vector (X,Y,Z,T) and the associated uncertainties.
+#define POSITION_STATE_DECLARATION                                      \
+    public:                                                             \
+    /** Get the index of the Position field.*/                          \
+    int GetPositionIndex() const {return fPositionIndex;}               \
+    /** Get the index of the X,Y,Z,T fields in the TCorrValues vector.*/ \
+    int GetXIndex() const {return fPositionIndex;}                      \
+    int GetYIndex() const {return fPositionIndex+1;}                    \
+    int GetZIndex() const {return fPositionIndex+2;}                    \
+    int GetTIndex() const {return fPositionIndex+3;}                    \
+    /** Get the value of the Position. */                               \
+    TLorentzVector GetPosition() const {                                \
+        return TLorentzVector(GetValue(fPositionIndex+0),               \
+                              GetValue(fPositionIndex+1),               \
+                              GetValue(fPositionIndex+2),               \
+                              GetValue(fPositionIndex+3));              \
+    }                                                                   \
+    /** Set the value of the Position.*/                                \
+    void SetPosition(double x, double y, double z, double t) {          \
+        SetValue(fPositionIndex+0,x);                                   \
+        SetValue(fPositionIndex+1,y);                                   \
+        SetValue(fPositionIndex+2,z);                                   \
+        SetValue(fPositionIndex+3,t);                                   \
+    }                                                                   \
+    /** Set the value of the Position.*/                                \
+    void SetPosition(const TLorentzVector& pos) {                       \
+        SetPosition(pos.X(),pos.Y(),pos.Z(),pos.T());                   \
+    }                                                                   \
+    /** Set the covariance of the position variables.  The indices */   \
+    /* run from 0 to 3 (0: X, 1: Y, 2: Z, 3: T).*/                      \
+    void SetPositionCovariance(int i, int j, double v) {                \
+        SetCovarianceValue(fPositionIndex+i,fPositionIndex+j,v);        \
+    }                                                                   \
+    /** Get the covariance of the position variables.  The indices */   \
+    /* run from 0 to 3 (0: X, 1: Y, 2: Z, 3: T).*/                      \
+    double GetPositionCovariance(int i, int j) const {                  \
+        return GetCovarianceValue(fPositionIndex+i,fPositionIndex+j);   \
+    }                                                                   \
+    /** Get the variance of the Position.*/                             \
+    TLorentzVector GetPositionVariance(void) const {                    \
+        return TLorentzVector(                                          \
+            GetPositionCovariance(0,0),                                 \
+            GetPositionCovariance(1,1),                                 \
+            GetPositionCovariance(2,2),                                 \
+            GetPositionCovariance(3,3));                                \
+    }                                                                   \
+    /** Set the variance of the Position.*/                             \
+    void SetPositionVariance(double x, double y, double z, double t) {  \
+        SetPositionCovariance(0,0,x);                                   \
+        SetPositionCovariance(1,1,y);                                   \
+        SetPositionCovariance(2,2,z);                                   \
+        SetPositionCovariance(3,3,t);                                   \
     }
 
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
+#define POSITION_STATE_PRIVATE                                      \
+    private: unsigned char fPositionIndex;
 
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMPositionDirectionState,0);
-#endif
-};
+/// This should be included in the class constructor.
+#define POSITION_STATE_DEFINITION                                       \
+    fPositionIndex=fFieldNames.size();                                  \
+    fFieldNames.push_back("X");                                         \
+    fFieldNames.push_back("Y");                                         \
+    fFieldNames.push_back("Z");                                         \
+    fFieldNames.push_back("T")
 
-/// A mixable base class that adds the width of a TReconShower object.  The
-/// cone value depends on the type of the shower fit.  For a EM fit, the cone
-/// value will represent the local width of the shower.
-class CP::TMConeState: virtual public TMReconState {
-public:
-    TMConeState();
-    virtual ~TMConeState();
-
-    /// Get the value of the Cone.
-    double GetCone() const;
-
-    /// Set the value of the Cone.
-    void SetCone(double c1);
-
-    /// Get the variance of the Cone.
-    double GetConeVariance(void) const;
-
-    /// Set the variance of the Cone.
-    void SetConeVariance(double c1);
-
-    /// Get the index of the Cone field in the TCorrValues vector.
-    int GetConeIndex() const {return fConeIndex;}
-
-    /// Return the number of entries for the Cone in the TCorrValues
-    /// vector.
-    static int GetSize() {return 1;}
-
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
-
-protected:
-    /// The index of the Cone field in the TCorrValues object.
-    int fConeIndex; //! Do not save.
-
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMConeState,0);
-#endif
-};
-
-/// A mixable base class that adds the mass to a state.  The mass state also
-/// holds the associated uncertainties.
-class CP::TMMassState: virtual public TMReconState {
-public:
-    TMMassState();
-
-    virtual ~TMMassState();
-
-    /// Get the value of the Mass.
-    double GetMass() const;
-
-    /// Set the value of the Mass.
-    void SetMass(double enr);
-
-    /// Get the variance of the Mass.
-    double GetMassVariance(void) const;
-
-    /// Set the variance of the Mass.
-    void SetMassVariance(double var);
-
-    /// Get the index of the Mass field in the TCorrValues vector.
-    int GetMassIndex() const {return fMassIndex;}
-
-    /// Return the number of entries for the Mass in the TCorrValues
-    /// vector.
-    static int GetSize() {return 1;}
-
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
-
-protected:
-    /// The index of the Mass field in the TCorrValues object.
-    int fMassIndex; //! Do not save.
-
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMMassState,0);
-#endif
-};
-
-/// A mixable base class that adds the position, direction and mass
-/// properties to a state using the TMPositionDirectionState and
-/// TMMassState classes.
-class CP::TMPosDirMassState: virtual public TMPositionDirectionState,
-                             virtual public TMMassState {
-public:
-    TMPosDirMassState() {}
-    virtual ~TMPosDirMassState();
-
-    int GetPosDirMassIndex() const {return GetPositionDirectionIndex();}
-
-    /// Return the number of entries for the Direction in the TCorrValues
-    /// vector.
-    static int GetSize() {
-        return TMPositionDirectionState::GetSize()
-            + TMMassState::GetSize();
+/// A macro that adds the direction property to a state.  The direction state
+/// is defined as a three vector (dX,dY,dZ) and the associated uncertainties.
+/// The corelations between the components are enforced in the covariance
+/// matrix.
+#define DIRECTION_STATE_DECLARATION                                     \
+    public:                                                             \
+    /** Get the index of the direction field.*/                         \
+    int GetDirectionIndex() const {return fDirectionIndex;}             \
+    /** Get the value of the direction. */                              \
+    TVector3 GetDirection() const {                                     \
+        return TVector3(GetValue(fDirectionIndex+0),                    \
+                        GetValue(fDirectionIndex+1),                    \
+                        GetValue(fDirectionIndex+2));                   \
+    }                                                                   \
+    /** Set the value of the direction.*/                               \
+    void SetDirection(double x, double y, double z) {                   \
+        SetValue(fDirectionIndex+0,x);                                  \
+        SetValue(fDirectionIndex+1,y);                                  \
+        SetValue(fDirectionIndex+2,z);                                  \
+    }                                                                   \
+    /** Set the value of the direction.*/                               \
+    void SetDirection(const TVector3& dir) {                            \
+        SetDirection(dir.X(),dir.Y(),dir.Z());                          \
+    }                                                                   \
+    /** Set the covariance of the direction variables.  The indices */  \
+    /* run from 0 to 2 (0: dX, 1: dY, 2: dZ).*/                         \
+    void SetDirectionCovariance(int i, int j, double v) {               \
+        SetCovarianceValue(fDirectionIndex+i,fDirectionIndex+j,v);      \
+    }                                                                   \
+    /** Get the covariance of the direction variables.  The indices */  \
+    /* run from 0 to 2 (0: dX, 1: dY, 2: dZ).*/                         \
+    double GetDirectionCovariance(int i, int j) const {                 \
+        return GetCovarianceValue(fDirectionIndex+i,fDirectionIndex+j); \
+    }                                                                   \
+    /** Get the variance of the Direction.*/                            \
+    TVector3 GetDirectionVariance(void) const {                         \
+        return TVector3(                                                \
+            GetDirectionCovariance(0,0),                                \
+            GetDirectionCovariance(1,1),                                \
+            GetDirectionCovariance(2,2));                               \
+    }                                                                   \
+    /** Set the variance of the Direction.*/                            \
+    void SetDirectionVariance(double x, double y, double z) {           \
+        SetDirectionCovariance(0,0,x);                                  \
+        SetDirectionCovariance(1,1,y);                                  \
+        SetDirectionCovariance(2,2,z);                                  \
     }
 
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
+#define DIRECTION_STATE_PRIVATE                 \
+    private: unsigned char fDirectionIndex;
 
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMPosDirMassState,0);
+/// This should be included in the class constructor.
+#define DIRECTION_STATE_DEFINITION                                      \
+    fDirectionIndex=fFieldNames.size();                                 \
+    fFieldNames.push_back("dX");                                        \
+    fFieldNames.push_back("dY");                                        \
+    fFieldNames.push_back("dZ")
+
+/// A macro that adds the width of a TReconShower object.  The cone value
+/// depends on the type of the shower fit.  For a EM fit, the cone value will
+/// represent the local width of the shower.
+#define CONE_STATE_DECLARATION                                          \
+    public:                                                             \
+    /** Get the index of the cone field in the TCorrValues vector.*/    \
+    int GetConeIndex() const {return fConeIndex;}                       \
+    /** Get the value of the cone. */                                   \
+    double GetCone() const {return GetValue(fConeIndex);}               \
+    /** Set the value of the cone. */                                   \
+    void SetCone(double enr) {SetValue(fConeIndex,enr);}                \
+    /** Get the variance of the cone.*/                                 \
+    double GetConeVariance(void) const                                  \
+    {return GetCovarianceValue(fConeIndex,fConeIndex);}                 \
+    /** Set the variance of the cone.  */                               \
+    void SetConeVariance(double var)                                    \
+    {SetCovarianceValue(fConeIndex,fConeIndex,var);}
+
+#define CONE_STATE_PRIVATE                      \
+    private: unsigned char fConeIndex;
+
+/// This should be included in the class constructor.
+#define CONE_STATE_DEFINITION                                       \
+    fConeIndex=fFieldNames.size();                                  \
+    fFieldNames.push_back("Cone")
+
+/// A macro that adds the mass to a state.  The mass state also holds the
+/// associated uncertainties.
+#define MASS_STATE_DECLARATION                                          \
+    public:                                                             \
+    /** Get the index of the mass field in the TCorrValues vector.*/    \
+    int GetMassIndex() const {return fMassIndex;}                       \
+    /** Get the value of the mass. */                                   \
+    double GetMass() const {return GetValue(fMassIndex);}               \
+    /** Set the value of the mass. */                                   \
+    void SetMass(double mass) {SetValue(fMassIndex,mass);}              \
+    /** Get the variance of the mass. */                                \
+    double GetMassVariance(void) const                                  \
+    {return GetCovarianceValue(fMassIndex,fMassIndex);}                 \
+    /** Set the variance of the mass. */                                \
+    void SetMassVariance(double mass)                                   \
+    {SetCovarianceValue(fMassIndex,fMassIndex,mass);}
+
+#define MASS_STATE_PRIVATE                      \
+    private: unsigned char fMassIndex;
+     
+/// This should be included in the class constructor.
+#define MASS_STATE_DEFINITION                                       \
+    fMassIndex=fFieldNames.size();                                  \
+    fFieldNames.push_back("Mass")
+
+/// A macro that adds the width of a curvilinear energy deposit property to a
+/// state.  The width is the extent of an energy deposition perpendicular to
+/// local direction and the associated uncertainties.
+#define WIDTH_STATE_DECLARATION                                         \
+    public:                                                             \
+    /** Get the index of the width field in the TCorrValues vector.*/   \
+    int GetWidthIndex() const {return fWidthIndex;}                     \
+    /** Get the value of the width. */                                  \
+    double GetWidth() const {return GetValue(fWidthIndex);}             \
+    /** Set the value of the width. */                                  \
+    void SetWidth(double width) {SetValue(fWidthIndex,width);}          \
+    /** Get the variance of the width. */                               \
+    double GetWidthVariance(void) const                                 \
+    {return GetCovarianceValue(fWidthIndex,fWidthIndex);}               \
+    /** Set the variance of the width. */                               \
+    void SetWidthVariance(double width)                                 \
+    {SetCovarianceValue(fWidthIndex,fWidthIndex,width);}
+
+#define WIDTH_STATE_PRIVATE                     \
+    private: unsigned char fWidthIndex;
+
+/// This should be included in the class constructor.
+#define WIDTH_STATE_DEFINITION                                       \
+    fWidthIndex=fFieldNames.size();                                  \
+    fFieldNames.push_back("Width")
+
+/// A macro that adds a property for the magnitude of the momentum to a state.
+#define MOMENTUM_STATE_DECLARATION                                      \
+    public:                                                             \
+    /** Get the index of the momentum field in the TCorrValues vector.*/ \
+    int GetMomentumIndex() const {return fMomentumIndex;}               \
+    /** Get the value of the momentum. */                               \
+    double GetMomentum() const {return GetValue(fMomentumIndex);}       \
+    /** Set the value of the momentum. */                               \
+    void SetMomentum(double momentum) {SetValue(fMomentumIndex,momentum);} \
+    /** Get the variance of the momentum. */                            \
+    double GetMomentumVariance(void) const                              \
+    {return GetCovarianceValue(fMomentumIndex,fMomentumIndex);}         \
+    /** Set the variance of the momentum. */                            \
+    void SetMomentumVariance(double momentum)                           \
+    {SetCovarianceValue(fMomentumIndex,fMomentumIndex,momentum);}
+
+#define MOMENTUM_STATE_PRIVATE                                          \
+    private: unsigned char fMomentumIndex;
+
+/// This should be included in the class constructor.
+#define MOMENTUM_STATE_DEFINITION                                       \
+    fMomentumIndex=fFieldNames.size();                                  \
+    fFieldNames.push_back("Momentum")
+
+/// A macro that adds a property for the magnitude of the particle charge to a
+/// state.
+#define CHARGE_STATE_DECLARATION                                       \
+    public:                                                             \
+    /** Get the index of the charge field in the TCorrValues vector.*/  \
+    int GetChargeIndex() const {return fChargeIndex;}                  \
+    /** Get the value of the charge. */                                \
+    double GetCharge() const {return GetValue(fChargeIndex);}          \
+    /** Set the value of the charge. */                                \
+    void SetCharge(double charge) {SetValue(fChargeIndex,charge);}     \
+    /** Get the variance of the charge. */                             \
+    double GetChargeVariance(void) const                               \
+    {return GetCovarianceValue(fChargeIndex,fChargeIndex);}            \
+    /** Set the variance of the charge. */                             \
+    void SetChargeVariance(double charge)                              \
+    {SetCovarianceValue(fChargeIndex,fChargeIndex,charge);}
+
+#define CHARGE_STATE_PRIVATE                                           \
+    private: unsigned char fChargeIndex;
+
+/// This should be included in the class constructor.
+#define CHARGE_STATE_DEFINITION                                       \
+    fChargeIndex=fFieldNames.size();                                  \
+    fFieldNames.push_back("Charge")
+
 #endif
-};
 
-/// A mixable base class that adds the width of a curvilinear energy deposit
-/// property to a state.  The width is the extent of an energy deposition
-/// perpendicular to local direction and the associated uncertainties.
-class CP::TMWidthState: virtual public TMReconState {
-public:
-    TMWidthState();
-
-    virtual ~TMWidthState();
-
-    /// Get the value of the Width.
-    double GetWidth() const;
-
-    /// Set the value of the Width.
-    void SetWidth(double w1);
-
-    /// Get the variance of the Width.
-    double GetWidthVariance(void) const;
-
-    /// Set the variance of the Width.
-    void SetWidthVariance(double w1);
-
-    /// Get the index of the Width field in the TCorrValues vector.
-    int GetWidthIndex() const {return fWidthIndex;}
-
-    /// Return the number of entries for the Width in the TCorrValues
-    /// vector.
-    static int GetSize() {return 1;}
-
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
-
-protected:
-    /// The index of the Width field in the TCorrValues object.
-    int fWidthIndex; //! Do not save.
-
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMWidthState,0);
-#endif
-};
-
-/// A mixable base class that adds a property for the magnitude of the
-/// momentum to a state.  
-class CP::TMMomentumState: virtual public TMReconState {
-public:
-    TMMomentumState();
-
-    virtual ~TMMomentumState();
-
-    /// Get the value of the Momentum.
-    double GetMomentum() const;
-
-    /// Set the value of the Momentum.
-    void SetMomentum(double enr);
-
-    /// Get the variance of the Momentum.
-    double GetMomentumVariance(void) const;
-
-    /// Set the variance of the Momentum.
-    void SetMomentumVariance(double var);
-
-    /// Get the index of the Momentum field in the TCorrValues vector.
-    int GetMomentumIndex() const {return fMomentumIndex;}
-
-    /// Return the number of entries for the Momentum in the TCorrValues
-    /// vector.
-    static int GetSize() {return 1;}
-
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
-
-protected:
-    /// The index of the Momentum field in the TCorrValues object.
-    int fMomentumIndex; //! Do not save.
-
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMMomentumState,0);
-#endif
-};
-
-/// A mixable base class that adds a property for the magnitude of the
-/// particle charge to a state.  
-class CP::TMChargeState: virtual public TMReconState {
-public:
-    TMChargeState();
-
-    virtual ~TMChargeState();
-
-    /// Get the value of the Charge.
-    double GetCharge() const;
-
-    /// Set the value of the Charge.
-    void SetCharge(double enr);
-
-    /// Get the variance of the Charge.
-    double GetChargeVariance(void) const;
-
-    /// Set the variance of the Charge.
-    void SetChargeVariance(double var);
-
-    /// Get the index of the Charge field in the TCorrValues vector.
-    int GetChargeIndex() const {return fChargeIndex;}
-
-    /// Return the number of entries for the Charge in the TCorrValues
-    /// vector.
-    static int GetSize() {return 1;}
-
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<TReconState>& state);
-
-protected:
-    /// The index of the Charge field in the TCorrValues object.
-    int fChargeIndex; //! Do not save.
-
-#ifdef USE_RECONSTATE_CLASS_DEF
-    ClassDef(CP::TMChargeState,0);
-#endif
-};
-#endif

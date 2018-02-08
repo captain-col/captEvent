@@ -51,8 +51,8 @@ CP::TReconCluster::~TReconCluster() {}
 double CP::TReconCluster::GetEDeposit() const {
     // I'm being a bit pedantic and casting to the base mix-in class.  This
     // could just as well cast to a TClusterState.
-    const TMEDepositState* state 
-        = dynamic_cast<const TMEDepositState*>(fState);
+    const TClusterState* state 
+        = dynamic_cast<const TClusterState*>(fState);
     if (!state) throw EMissingField();
     return state->GetEDeposit();
 }
@@ -60,8 +60,8 @@ double CP::TReconCluster::GetEDeposit() const {
 double CP::TReconCluster::GetEDepositVariance() const {
     // I'm being a bit pedantic and casting to the base mix-in class.  This
     // could just as well cast to a TClusterState.
-    const TMEDepositState* state 
-        = dynamic_cast<const TMEDepositState*>(fState);
+    const TClusterState* state 
+        = dynamic_cast<const TClusterState*>(fState);
     if (!state) throw EMissingField();
     return state->GetEDepositVariance();
 }

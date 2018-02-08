@@ -12,15 +12,7 @@ namespace CP {
     
 /// A state holding parameters associated with a TReconPID.  
 class CP::TPIDState:
-#ifndef __CINT__
-    public TReconState, 
-    virtual public TMReconState,
-    virtual public TMPositionDirectionState, 
-    virtual public TMMomentumState,
-    virtual public TMChargeState
-#else
     public TReconState
-#endif
 {
 public:
     TPIDState();
@@ -31,16 +23,17 @@ public:
     virtual ~TPIDState();
     virtual TPIDState& operator=(const CP::TPIDState& rhs);
 
-    /// Return the number of entries for the Direction in the TCorrValues
-    /// vector.
-    static int GetSize() {
-        return TMPositionDirectionState::GetSize() 
-            + TMMomentumState::GetSize()
-            + TMChargeState::GetSize();
-    }
+    ENERGY_DEPOSIT_STATE_DECLARATION;
+    POSITION_STATE_DECLARATION;
+    DIRECTION_STATE_DECLARATION;
+    MOMENTUM_STATE_DECLARATION;
+    CHARGE_STATE_DECLARATION;
 
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<CP::TReconState>& state);
+    ENERGY_DEPOSIT_STATE_PRIVATE;
+    POSITION_STATE_PRIVATE;
+    DIRECTION_STATE_PRIVATE;
+    MOMENTUM_STATE_PRIVATE;
+    CHARGE_STATE_PRIVATE;
 
     ClassDef(TPIDState,2);
 };
