@@ -11,15 +11,7 @@ namespace CP {
 /// A state holding parameters associated with a TReconTrack, and the
 /// intermediate states.
 class CP::TTrackState:
-#ifndef __CINT__
-    public TReconState,
-    virtual public TMReconState,
-    virtual public TMEDepositState,
-    virtual public TMPosDirMassState,
-    virtual public TMWidthState
-#else
     public TReconState
-#endif
 {
 public:
     TTrackState();
@@ -27,16 +19,17 @@ public:
     virtual ~TTrackState();
     virtual TTrackState& operator=(const TTrackState& rhs);
 
-    /// Return the number of entries for the Direction in the TCorrValues
-    /// vector.
-    static int GetSize() {
-        return TMEDepositState::GetSize() 
-            + TMPosDirMassState::GetSize()
-            + TMWidthState::GetSize();
-    }
+    ENERGY_DEPOSIT_STATE_DECLARATION;
+    POSITION_STATE_DECLARATION;
+    DIRECTION_STATE_DECLARATION;
+    MASS_STATE_DECLARATION;
+    WIDTH_STATE_DECLARATION;
 
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const CP::THandle<CP::TReconState>& state);
+    ENERGY_DEPOSIT_STATE_PRIVATE;
+    POSITION_STATE_PRIVATE;
+    DIRECTION_STATE_PRIVATE;
+    MASS_STATE_PRIVATE;
+    WIDTH_STATE_PRIVATE;
 
     ClassDef(TTrackState,2);
 };

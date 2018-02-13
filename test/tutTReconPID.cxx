@@ -59,7 +59,7 @@ namespace tut {
         ensure("The state is valid", recState);
 
         const int stateDim = recState->GetDimensions();
-        ensure_equals("PID state dimensions", stateDim, 9);
+        ensure_equals("PID state dimensions", stateDim, 10);
     }
 
     // Test nodes which are saved have the correct type of state and all have

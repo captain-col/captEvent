@@ -9,14 +9,7 @@ namespace CP {
 }
 
 /// A state holding parameters associated with a TReconVertex.
-class CP::TVertexState:
-#ifndef __CINT__
-    public TReconState,
-    virtual public TMReconState,
-    virtual public TMPositionState
-#else
-    public TReconState
-#endif
+class CP::TVertexState: public TReconState
 {
 public:
     TVertexState();
@@ -24,16 +17,10 @@ public:
     TVertexState(const TVertexState& init);
     virtual TVertexState& operator=(const TVertexState& rhs);
 
-    /// Return the number of entries for the Direction in the TCorrValues
-    /// vector.
-    static int GetSize() {
-        return TMPositionState::GetSize();
-    }
-
-    /// The projection operator to get the full state.
-    static CP::TCorrValues ProjectState(const 
-                                        CP::THandle<CP::TReconState>& state);
+    POSITION_STATE_DECLARATION;
     
-    ClassDef(TVertexState,2);
+    POSITION_STATE_PRIVATE;
+    
+    ClassDef(TVertexState,3);
 };
 #endif

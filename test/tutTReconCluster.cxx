@@ -141,8 +141,8 @@ namespace tut {
 
         int posIndex = recState->GetPositionIndex();
         double posVar = 0.0;
-        for (int i=0; i<CP::TMPositionState::GetSize(); ++i) {
-            for (int j=i; j<CP::TMPositionState::GetSize(); ++j) {
+        for (int i=0; i<4; ++i) {
+            for (int j=i; j<4; ++j) {
                 posVar += 1.0;
                 recState->SetCovarianceValue(i+posIndex,j+posIndex,posVar);
                 double val 
@@ -166,8 +166,8 @@ namespace tut {
                         s1->GetEDepositVariance(), energyVar, 0.0001);
 
         posVar = 0.0;
-        for (int i=0; i<CP::TMPositionState::GetSize(); ++i) {
-            for (int j=i; j<CP::TMPositionState::GetSize(); ++j) {
+        for (int i=0; i<4; ++i) {
+            for (int j=i; j<4; ++j) {
                 posVar += 1.0;
                 double val 
                     = recState->GetCovarianceValue(i+posIndex,j+posIndex);
