@@ -121,4 +121,35 @@ Freeze information:
 
 A (likely) final freeze before changing the TReconState format.
 
+
+\section captEvent_v2r0p0_history Version 2.0.0
+
+Freeze information:
+   - Freeze Date: Tue Feb 13 09:33:36 2018
+   - Freeze User: mcgrew
+   - Freeze Host: boxer boxer.physics.sunysb.edu 
+
+
+Create a new major version to flag a significant change in the underlying
+object format for TReconState derived objects.   Hopefully, none of the
+changes will affect code using this library.
+
+This change is prompted because the original interface depended on the use
+of multiply inherited mix-in classes to implement the different types of
+fields that appear in a class describing the reconstruction state.  For
+instance, the direction occurs in TShowerState, and TTrackState (&c), but
+not TVertexState.  In the original interface, the direction was handled by
+the TMDirectionState class that was added to the objects which contained a
+direction, and this prevented code duplication.
+
+Unfortunately, ROOT6 apparently does not support multiple inheritance, so
+the old implementation needs to be changed. The solution that has been
+chosen is to use C macros to capture the duplicated interface.  It's not as
+C++y, but should have longevity.
+
+The initial implementation probably can't read old files containing
+TReconState derived objects, but very few of those files have been
+generated (in CAPTAIN).  It *may* be possible to change this code to make
+the old files forward compatible, but that is not a priority right now.
+
 */
