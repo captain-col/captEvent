@@ -110,4 +110,15 @@ SIGIFICANT BUGS FIXED:
 
 * Make sure all the TSingleHit fields are copied by the copy constructor.
 
+
+\section captEvent_v1r2p0_history Version 1.2.0
+
+Freeze information:
+   - Freeze Date: Tue Feb 13 09:17:44 2018
+   - Freeze User: mcgrew
+   - Freeze Host: boxer boxer.physics.sunysb.edu 
+
+
+A (likely) final freeze before changing the TReconState format.
+
 */
