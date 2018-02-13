@@ -35,6 +35,6 @@ public:
     MOMENTUM_STATE_PRIVATE;
     CHARGE_STATE_PRIVATE;
 
-    ClassDef(TPIDState,2);
+    ClassDef(TPIDState,3);
 };
 #endif

@@ -24,6 +24,6 @@ public:
     POSITION_STATE_PRIVATE;
     ENERGY_DEPOSIT_STATE_PRIVATE;
     
-    ClassDef(TClusterState,2);
+    ClassDef(TClusterState,3);
 };
 #endif

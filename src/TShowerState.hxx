@@ -28,6 +28,6 @@ public:
     DIRECTION_STATE_PRIVATE;
     CONE_STATE_PRIVATE;
     
-    ClassDef(TShowerState,2);
+    ClassDef(TShowerState,3);
 };
 #endif

@@ -31,7 +31,7 @@ public:
     MASS_STATE_PRIVATE;
     WIDTH_STATE_PRIVATE;
 
-    ClassDef(TTrackState,2);
+    ClassDef(TTrackState,3);
 };
 
 #endif
