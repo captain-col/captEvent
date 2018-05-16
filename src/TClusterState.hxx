@@ -18,11 +18,11 @@ public:
     TClusterState(const TClusterState& init);
     virtual TClusterState& operator=(const TClusterState& rhs);
 
-    POSITION_STATE_DECLARATION;
     ENERGY_DEPOSIT_STATE_DECLARATION;
+    POSITION_STATE_DECLARATION;
 
-    POSITION_STATE_PRIVATE;
     ENERGY_DEPOSIT_STATE_PRIVATE;
+    POSITION_STATE_PRIVATE;
     
     ClassDef(TClusterState,3);
 };
