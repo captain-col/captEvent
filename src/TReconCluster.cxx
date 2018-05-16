@@ -191,7 +191,7 @@ void CP::TReconCluster::UpdateFromHits() {
         }
     }
         
-    stateNorms(0) = 1.0;
+    stateNorms(eDep) = 1.0;
     for (int i=0; i<dim; ++i) {
         if (stateNorms(i) > 0) stateValues(i) /= stateNorms(i);
     }
