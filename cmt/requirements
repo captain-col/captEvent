@@ -61,6 +61,9 @@ setup_script geometry_setup
 application dump-event ../app/dump-event.cxx
 apply_pattern dependency target=dump-event depends=captEvent
 
+application strip-digits ../app/strip-digits.cxx
+apply_pattern dependency target=strip-digits depends=captEvent
+
 application strip-geom ../app/strip-geom.cxx 
 apply_pattern dependency target=strip-geom depends=captEvent
 
