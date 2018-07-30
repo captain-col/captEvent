@@ -51,6 +51,6 @@ private:
 
 int main(int argc, char **argv) {
     TStripDigits userCode;
-    CP::eventLoop(argc,argv,userCode,1);
+    CP::eventLoop(argc,argv,userCode);
 }
 
